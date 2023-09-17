@@ -34,7 +34,7 @@ navbar = dbc.Navbar(
                                 style={'paddingLeft':'15px'},
                                 children=[
                                     dbc.DropdownMenuItem("Map", href='/map'),
-                                    dbc.DropdownMenuItem("Github", href='https://github.com/Major2000/FOOD-PRICES-PREDICTION'),
+                                    dbc.DropdownMenuItem("Github", href='https://github.com/Major2000/CROPS-PRICE-TANZANIA'),
                                     # dbc.DropdownMenuItem("Description", href='/description')
                                 ],
                                 nav=True,

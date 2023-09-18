@@ -3,6 +3,7 @@ import dash_bootstrap_components as dbc
 import pandas as pd
 import pickle as pkl
 import plotly.express as px
+import numpy as np
 from navbar import navbar
 import warnings
 import requests
@@ -18,24 +19,24 @@ columns = [col for col in data.columns if col not in [
 
 
 
-maize_url = 'https://drive.google.com/uc?export=download&id=1C23g0GnUcVilDHJetYFyZdpUOugU2JQW'
-beans_url = 'https://drive.google.com/uc?export=download&id=1Qvn3zD0OR-5cyB1UioHDDFFG26nELmJg'
-rice_url = 'https://drive.google.com/uc?export=download&id=1bmVKarTIY-M4M1FU-ZzqJ5s1ppAuO5pL'
+# maize_url = 'https://drive.google.com/uc?export=download&id=1C23g0GnUcVilDHJetYFyZdpUOugU2JQW'
+# beans_url = 'https://drive.google.com/uc?export=download&id=1Qvn3zD0OR-5cyB1UioHDDFFG26nELmJg'
+# rice_url = 'https://drive.google.com/uc?export=download&id=1bmVKarTIY-M4M1FU-ZzqJ5s1ppAuO5pL'
 
-def download_model(url, filename):
-    response = requests.get(url)
-    with open(filename, 'wb') as f:
-        f.write(response.content)
+# def download_model(url, filename):
+#     response = requests.get(url)
+#     with open(filename, 'wb') as f:
+#         f.write(response.content)
 
-download_model(maize_url, 'maize_model.pkl')
-download_model(beans_url, 'beans_model.pkl')
-download_model(rice_url, 'rice_model.pkl')
+# download_model(maize_url, 'maize_model.pkl')
+# download_model(beans_url, 'beans_model.pkl')
+# download_model(rice_url, 'rice_model.pkl')
 
 
 
-maize_model = pkl.load(open('maize_model.pkl', 'rb'))
-beans_model = pkl.load(open('beans_model.pkl', 'rb'))
-rice_model = pkl.load(open('rice_model.pkl', 'rb'))
+maize_model = pkl.load(open('../Models/Maize/Maize_model_CatBoost Regressor.pkl', 'rb'))
+# beans_model = pkl.load(open('beans_model.pkl', 'rb'))
+# rice_model = pkl.load(open('rice_model.pkl', 'rb'))
 
 
 def generate_input_data(selected_market, selected_crop, selected_month, selected_year):
@@ -85,19 +86,17 @@ sidebar = html.Div(
                              for crop in data['commodity'].unique()],
                     placeholder="Select Crop"
                 ),
-
-                dcc.Dropdown(
-                    id='month-dropdown',
-                    options=[{'label': month, 'value': month}
-                             for month in range(1, 13)],
-                    placeholder="Select Month"
-                ),
-
+                
                 dcc.Dropdown(
                     id='year-dropdown',
                     options=[{'label': year, 'value': year} for year in range(
-                        pd.Timestamp.now().year, pd.Timestamp.now().year + 6)],
+                        pd.Timestamp.now().year, pd.Timestamp.now().year + 3)],
                     placeholder="Select Year"
+                ),
+
+                dcc.Dropdown(
+                    id='month-dropdown',
+                    placeholder="Select Month"
                 ),
 
                 dbc.Button("Forecast Price", color="primary",
@@ -291,6 +290,8 @@ def predict_price(n_clicks, selected_crop, selected_market, selected_month, sele
     inputs = pd.DataFrame(columns=column_order)
 
     inputs['year'] = [selected_year]
+    inputs['year'] = np.log10(inputs['year'])
+
     inputs['month'] = [selected_month]
 
     for market_col in column_order[2:]:
@@ -365,3 +366,13 @@ def update_graph(crop, radio):
         )
         return fig
 
+
+@callback(
+    Output('month-dropdown', 'options'),
+    Input('year-dropdown', 'value')
+)
+def month_values(value):
+    if str(pd.Timestamp.now().year) == str(value):
+        return [{'label': month, 'value': month} for month in range(pd.Timestamp.now().month + 1, 13)]
+    else:
+        return [{'label': month, 'value': month} for month in range(1, 13)]

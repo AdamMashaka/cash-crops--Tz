@@ -1,5 +1,5 @@
 fastapi
-fastapi-sockeio
+fastapi-socketio
 pydantic
 pickle5
 pandas

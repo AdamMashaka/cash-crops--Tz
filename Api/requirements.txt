@@ -3,3 +3,4 @@ pydantic
 pickle5
 pandas
 uvicorn
+xgboost

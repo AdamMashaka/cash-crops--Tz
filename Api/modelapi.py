@@ -3,9 +3,9 @@ from pydantic import BaseModel
 import pickle as pk
 import pandas as pd
 
-Maize_model = pk.load(open('../Models/Maize/Maize_model_XGBoost Regressor.pkl', 'rb'))
-Beans_model = pk.load(open('../Models/Beans/Beans_model_XGBoost Regressor.pkl', 'rb'))
-Rice_model = pk.load(open('../Models/Rice/Rice_model_XGBoost Regressor.pkl', 'rb'))
+Maize_model = pk.load(open('Maize/Maize_model_XGBoost Regressor.pkl', 'rb'))
+Beans_model = pk.load(open('Beans_model_XGBoost Regressor.pkl', 'rb'))
+Rice_model = pk.load(open('Rice_model_XGBoost Regressor.pkl', 'rb'))
 
 
 app = FastAPI()

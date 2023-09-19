@@ -6,6 +6,7 @@ import plotly.express as px
 import numpy as np
 from navbar import navbar
 import warnings
+import json
 import requests
 warnings.filterwarnings('ignore')
 
@@ -428,11 +429,20 @@ def predict_price(n_clicks, selected_crop, selected_market, selected_month, sele
     inputs = {}
 
     if selected_crop == 'Maize':
-        predicted_price = maize_model.predict(pipelineInput(inputDict= inputs))[0]
+        dataFrame = pipelineInput(inputDict=inputs)
+        json_data = dataFrame.to_json(orient='records')
+        res = requests.post('http://127.0.0.1:8000/predict-maize', json=json.loads(json_data)[0], headers={'Content-Type': 'application/json'})
+        predicted_price = res.json()
     elif selected_crop == 'Beans':
-        predicted_price = beans_model.predict(pipelineInput(inputDict= inputs))[0]
+        dataFrame = pipelineInput(inputDict=inputs)
+        json_data = dataFrame.to_json(orient='records')
+        res = requests.post('http://127.0.0.1:8000/predict-beans', json=json.loads(json_data)[0], headers={'Content-Type': 'application/json'})
+        predicted_price = res.json()
     elif selected_crop == 'Rice':
-        predicted_price = rice_model.predict(pipelineInput(inputDict= inputs))[0]
+        dataFrame = pipelineInput(inputDict=inputs)
+        json_data = dataFrame.to_json(orient='records')
+        res = requests.post('http://127.0.0.1:8000/predict-rice', json=json.loads(json_data)[0], headers={'Content-Type': 'application/json'})
+        predicted_price = res.json()
     if predicted_price is not None:
         return f'TZS {float(predicted_price):,.2f}'
     return ''

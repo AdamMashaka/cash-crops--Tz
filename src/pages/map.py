@@ -32,6 +32,13 @@ layout = html.Div([
 )
 def update_map(value):
     filtered_data = data[data['commodity'].isin(['Maize', 'Beans', 'Rice'])]
+    
+    maize_prices = filtered_data[filtered_data['commodity'] == 'Maize'].groupby('market')['price'].mean()
+    beans_prices = filtered_data[filtered_data['commodity'] == 'Beans'].groupby('market')['price'].mean()
+    rice_prices = filtered_data[filtered_data['commodity'] == 'Rice'].groupby('market')['price'].mean()
+
+    custom_text = filtered_data.apply(lambda row: f"{row['market']}<br>Average Maize Price: {maize_prices.get(row['market'], 0):,.2f}<br>Average Beans Price: {beans_prices.get(row['market'], 0):,.2f}<br>Average Rice Price: {rice_prices.get(row['market'], 0):,.2f}", axis=1)
+
     trace = go.Scattermapbox(
         lat=filtered_data['latitude'],
         lon=filtered_data['longitude'],
@@ -40,7 +47,7 @@ def update_map(value):
             size=10,
             color='red',
         ),
-        text=filtered_data.apply(lambda row: f"{row['market']}<br>Average Maize Price: {filtered_data[(filtered_data['commodity'] == 'Maize') & (filtered_data['market'] == row['market'])]['price'].mean():,.2f}<br>Average Beans Price: {filtered_data[(filtered_data['commodity'] == 'Beans') & (filtered_data['market'] == row['market'])]['price'].mean():,.2f}<br>Average Rice Price: {filtered_data[(filtered_data['commodity'] == 'Rice') & (filtered_data['market'] == row['market'])]['price'].mean():,.2f}", axis=1),
+        text= custom_text,
     )
     layout = go.Layout(
         autosize=True,

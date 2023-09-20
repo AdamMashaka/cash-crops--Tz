@@ -1,7 +1,6 @@
 fastapi
 fastapi-socketio
 pydantic
-pickle5
 pandas
 uvicorn
 xgboost

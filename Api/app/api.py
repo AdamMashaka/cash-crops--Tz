@@ -2,10 +2,13 @@ from fastapi import FastAPI
 from pydantic import BaseModel
 import pickle as pk
 import pandas as pd
+import pathlib
 
-Maize_model = pk.load(open('Maize_model_XGBoost Regressor.pkl', 'rb'))
-Beans_model = pk.load(open('Beans_model_XGBoost Regressor.pkl', 'rb'))
-Rice_model = pk.load(open('Rice_model_XGBoost Regressor.pkl', 'rb'))
+BASE_DIR = pathlib.Path(__file__).parent
+
+Maize_model = pk.load(open(BASE_DIR / 'Maize_model_XGBoost Regressor.pkl', 'rb'))
+Beans_model = pk.load(open(BASE_DIR / 'Beans_model_XGBoost Regressor.pkl', 'rb'))
+Rice_model = pk.load(open(BASE_DIR / 'Rice_model_XGBoost Regressor.pkl', 'rb'))
 
 
 app = FastAPI()

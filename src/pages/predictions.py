@@ -1,9 +1,7 @@
 from dash import html, dcc, Output, Input, register_page, callback, dash_table, State
 import dash_bootstrap_components as dbc
 import pandas as pd
-import pickle as pk
 import plotly.express as px
-import numpy as np
 from navbar import navbar
 import warnings
 import json
@@ -16,10 +14,6 @@ data = pd.read_csv('../Data/needed_food_data.csv')
 Maize_data = pd.read_csv('../Data/maize.csv')
 Beans_data = pd.read_csv('../Data/beans.csv')
 Rice_data = pd.read_csv('../Data/rice.csv')
-
-maize_model = pk.load(open('../Models/Maize/Maize_model_XGBoost Regressor.pkl', 'rb'))
-beans_model = pk.load(open('../Models/Beans/Beans_model_XGBoost Regressor.pkl', 'rb'))
-rice_model = pk.load(open('../Models/Rice/Rice_model_XGBoost Regressor.pkl', 'rb'))
 
 columns = [col for col in data.columns if col not in [
     'latitude', 'longitude', 'price', 'unit']]
@@ -431,17 +425,17 @@ def predict_price(n_clicks, selected_crop, selected_market, selected_month, sele
     if selected_crop == 'Maize':
         dataFrame = pipelineInput(inputDict=inputs)
         json_data = dataFrame.to_json(orient='records')
-        res = requests.post('http://127.0.0.1:8000/predict-maize', json=json.loads(json_data)[0], headers={'Content-Type': 'application/json'})
+        res = requests.post('https://crops-api.site.atomatiki.tech/predict-maize', json=json.loads(json_data)[0], headers={'Content-Type': 'application/json', 'Content-Security-Policy':'upgrade-insecure-requests'})
         predicted_price = res.json()
     elif selected_crop == 'Beans':
         dataFrame = pipelineInput(inputDict=inputs)
         json_data = dataFrame.to_json(orient='records')
-        res = requests.post('http://127.0.0.1:8000/predict-beans', json=json.loads(json_data)[0], headers={'Content-Type': 'application/json'})
+        res = requests.post('https://crops-api.site.atomatiki.tech/predict-beans', json=json.loads(json_data)[0], headers={'Content-Type': 'application/json', 'Content-Security-Policy':'upgrade-insecure-requests'})
         predicted_price = res.json()
     elif selected_crop == 'Rice':
         dataFrame = pipelineInput(inputDict=inputs)
         json_data = dataFrame.to_json(orient='records')
-        res = requests.post('http://127.0.0.1:8000/predict-rice', json=json.loads(json_data)[0], headers={'Content-Type': 'application/json'})
+        res = requests.post('https://crops-api.site.atomatiki.tech/predict-rice', json=json.loads(json_data)[0], headers={'Content-Type': 'application/json', 'Content-Security-Policy':'upgrade-insecure-requests'})
         predicted_price = res.json()
     if predicted_price is not None:
         return f'TZS {float(predicted_price):,.2f}'

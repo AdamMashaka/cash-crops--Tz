@@ -31,23 +31,24 @@ layout = html.Div([
     [Input('crops', 'value')]
 )
 def update_map(value):
+    filtered_data = data[data['commodity'].isin(['Maize', 'Beans', 'Rice'])]
     trace = go.Scattermapbox(
-        lat=data['latitude'],
-        lon=data['longitude'],
+        lat=filtered_data['latitude'],
+        lon=filtered_data['longitude'],
         mode='markers',
         marker=go.scattermapbox.Marker(
             size=10,
             color='red',
         ),
-        text=data['market'],
+        text=filtered_data.apply(lambda row: f"{row['market']}<br>Average Maize Price: {filtered_data[(filtered_data['commodity'] == 'Maize') & (filtered_data['market'] == row['market'])]['price'].mean():,.2f}<br>Average Beans Price: {filtered_data[(filtered_data['commodity'] == 'Beans') & (filtered_data['market'] == row['market'])]['price'].mean():,.2f}<br>Average Rice Price: {filtered_data[(filtered_data['commodity'] == 'Rice') & (filtered_data['market'] == row['market'])]['price'].mean():,.2f}", axis=1),
     )
     layout = go.Layout(
         autosize=True,
         hovermode='closest',
         mapbox=dict(
             center=dict(
-                lat=data['latitude'].median(),
-                lon=data['longitude'].median()
+                lat=filtered_data['latitude'].median(),
+                lon=filtered_data['longitude'].median()
             ),
             style='open-street-map',
             zoom=4.9,

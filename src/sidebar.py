@@ -31,6 +31,8 @@ sidebar = html.Div(
                             href="/visualize/market-price", active="exact"),
                 dbc.NavLink("High and Low Price",
                             href="/visualize/high-low-prices", active="exact"),
+                dbc.NavLink("Presidency Trend",
+                            href="/visualize/presidency", active="exact"),
                 dbc.NavLink("Crop Price Dist..",
                             href="/visualize/crop-distribution", active="exact"),
             ],

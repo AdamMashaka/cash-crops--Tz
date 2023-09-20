@@ -64,9 +64,9 @@ def update_high_low_graph(value):
     min_prices = data.groupby(value)["price"].min().reset_index()
 
     fig = px.scatter(max_prices, x=value, y="price", color_discrete_sequence=["green"], 
-                    labels={"price": "Max Price"}, title=f"Highest and Lowest Prices by {value.capitalize()}")
+                    labels={"price": "Max Price", "year":"Year", "month":"Month", "market":"Market"}, title=f"Highest and Lowest Prices by {value.capitalize()}")
     fig.add_trace(px.scatter(min_prices, x=value, y="price", color_discrete_sequence=["red"], 
-                            labels={"price": "Min Price"}).data[0])
+                            labels={"price": "Min Price", "year":"Year", "month":"Month", "market":"Market"}).data[0])
 
     for year, max_price in zip(max_prices[value], max_prices['price']):
         fig.add_shape(type="line",
@@ -81,6 +81,6 @@ def update_high_low_graph(value):
     fig.update_traces(marker=dict(size=12, symbol="circle"),
                     selector=dict(mode='markers'))
 
-    fig.update_layout(legend=dict(traceorder='reversed'), yaxis=dict(title='Price'))
+    fig.update_layout(legend=dict(traceorder='reversed'), yaxis=dict(title='Price'), title_x=0.5, xaxis_tickangle=-45)
 
     return fig

@@ -79,8 +79,8 @@ sidebar = html.Div(
                     placeholder="Select Month"
                 ),
 
-                dbc.Button("Forecast Price", color="primary",
-                           id='predict-button', n_clicks=0, disabled=True),
+                # dbc.Button("Forecast Price", color="primary",
+                #            id='predict-button', n_clicks=0, disabled=True),
             ]
         ),
     ],
@@ -202,34 +202,34 @@ layout = dbc.Container([
 # Callbacks
 
 
-@callback(
-    [
-        Output('predict-button', 'disabled'),
-        Output('predict-button', 'style')
-    ],
+# @callback(
+#     [
+#         Output('predict-button', 'disabled'),
+#         Output('predict-button', 'style')
+#     ],
 
-    [
-        Input('market-dropdown', 'value'),
-        Input('crop-dropdown', 'value'),
-        Input('month-dropdown', 'value'),
-        Input('year-dropdown', 'value')
-    ]
-)
-def enable_disable_button(selected_market, selected_crop, selected_month, selected_year):
-    all_dropdowns_filled = all(
-        [selected_market, selected_crop, selected_month, selected_year])
+#     [
+#         Input('market-dropdown', 'value'),
+#         Input('crop-dropdown', 'value'),
+#         Input('month-dropdown', 'value'),
+#         Input('year-dropdown', 'value')
+#     ]
+# )
+# def enable_disable_button(selected_market, selected_crop, selected_month, selected_year):
+#     all_dropdowns_filled = all(
+#         [selected_market, selected_crop, selected_month, selected_year])
 
-    button_style = {
-        'backgroundColor': 'rgba(144, 238, 144)',
-        'boxShadow': '0px 1px 5px #999',
-        'color': 'black',
-        'display': 'block',
-        'margin': 'auto',
-        'marginTop': '50%',
-        'borderColor': 'green' if all_dropdowns_filled else 'red'
-    }
+#     button_style = {
+#         'backgroundColor': 'rgba(144, 238, 144)',
+#         'boxShadow': '0px 1px 5px #999',
+#         'color': 'black',
+#         'display': 'block',
+#         'margin': 'auto',
+#         'marginTop': '50%',
+#         'borderColor': 'green' if all_dropdowns_filled else 'red'
+#     }
 
-    return not all_dropdowns_filled, button_style
+#     return not all_dropdowns_filled, button_style
 
 
 @callback(
@@ -250,196 +250,193 @@ def update_input_table(selected_market, selected_crop, selected_month, selected_
 @callback(
     Output('predicted-price', 'children'),
 
-    Input('predict-button', 'n_clicks'),
-    State('crop-dropdown', 'value'),
-    State('market-dropdown', 'value'),
-    State('month-dropdown', 'value'),
-    State('year-dropdown', 'value')
+    Input('crop-dropdown', 'value'),
+    Input('market-dropdown', 'value'),
+    Input('month-dropdown', 'value'),
+    Input('year-dropdown', 'value')
 )
-def predict_price(n_clicks, selected_crop, selected_market, selected_month, selected_year):
-    if n_clicks is None:
-        return None
+def predict_price(selected_crop, selected_market, selected_month, selected_year):
+
+    if all([selected_crop, selected_market, selected_month, selected_year]):
     
-    inputs = {}
+        column_order = [
+            'market',
+            'year',
+            'month',
+            'years_since_start',
+            'past_1_months_mean_price',
+            'past_2_months_mean_price',
+            'past_3_months_mean_price',
+            'past_4_months_mean_price',
+            'past_5_months_mean_price',
+            'past_6_months_mean_price',
+            'past_7_months_mean_price',
+            'past_8_months_mean_price',
+            'past_9_months_mean_price',
+            'past_10_months_mean_price',
+            'past_11_months_mean_price',
+            'past_1_years_mean_price',
+            'past_2_years_mean_price',
+            'past_3_years_mean_price',
+            'past_4_years_mean_price',
+            'past_5_years_mean_price',
+            'past_6_years_mean_price',
+            'past_7_years_mean_price',
+            'past_8_years_mean_price',
+            'past_9_years_mean_price',
+            'past_10_years_mean_price',
+            'past_11_years_mean_price',
+            'past_12_years_mean_price',
+            'past_13_years_mean_price',
+            'past_14_years_mean_price',
+            'past_15_years_mean_price',
+            'past_16_years_mean_price',
+            'past_17_years_mean_price',
+            'yearly_average_price',
+            'monthly_average_price',
+            'market_average_price',
+            'commodity_yearly_average_price',
+            'commodity_monthly_average_price'
+        ]
 
-    column_order = [
-        'market',
-        'year',
-        'month',
-        'years_since_start',
-        'past_1_months_mean_price',
-        'past_2_months_mean_price',
-        'past_3_months_mean_price',
-        'past_4_months_mean_price',
-        'past_5_months_mean_price',
-        'past_6_months_mean_price',
-        'past_7_months_mean_price',
-        'past_8_months_mean_price',
-        'past_9_months_mean_price',
-        'past_10_months_mean_price',
-        'past_11_months_mean_price',
-        'past_1_years_mean_price',
-        'past_2_years_mean_price',
-        'past_3_years_mean_price',
-        'past_4_years_mean_price',
-        'past_5_years_mean_price',
-        'past_6_years_mean_price',
-        'past_7_years_mean_price',
-        'past_8_years_mean_price',
-        'past_9_years_mean_price',
-        'past_10_years_mean_price',
-        'past_11_years_mean_price',
-        'past_12_years_mean_price',
-        'past_13_years_mean_price',
-        'past_14_years_mean_price',
-        'past_15_years_mean_price',
-        'past_16_years_mean_price',
-        'past_17_years_mean_price',
-        'yearly_average_price',
-        'monthly_average_price',
-        'market_average_price',
-        'commodity_yearly_average_price',
-        'commodity_monthly_average_price'
-    ]
+        market_mapping = {
+            'Arusha (urban)': 0,
+            'Babati': 1,
+            'Bukoba': 2,
+            'Dar es Salaam - Ilala': 3,
+            'Dar es Salaam - Kinondoni': 4,
+            'Dodoma (Kibaigwa)': 5,
+            'Dodoma (Majengo)': 6,
+            'Morogoro': 7,
+            'Mpanda': 8,
+            'Mtwara DC': 9,
+            'Musoma': 10,
+            'Tabora': 11,
+            'Tanga / Mgandini': 12
+        }
 
-    market_mapping = {
-        'Arusha (urban)': 0,
-        'Babati': 1,
-        'Bukoba': 2,
-        'Dar es Salaam - Ilala': 3,
-        'Dar es Salaam - Kinondoni': 4,
-        'Dodoma (Kibaigwa)': 5,
-        'Dodoma (Majengo)': 6,
-        'Morogoro': 7,
-        'Mpanda': 8,
-        'Mtwara DC': 9,
-        'Musoma': 10,
-        'Tabora': 11,
-        'Tanga / Mgandini': 12
-    }
+        def pipelineInput(inputDict):
 
-    def pipelineInput(inputDict):
+            inputDict['market'] =market_mapping.get(str(selected_market))
 
-        inputDict['market'] =market_mapping.get(str(selected_market))
+            inputDict['year'] = [int(selected_year)]
 
-        inputDict['year'] = [int(selected_year)]
+            inputDict['month'] = [int(selected_month)]
 
-        inputDict['month'] = [int(selected_month)]
+            inputDict['years_since_start'] = int(selected_year) - 2006
 
-        inputDict['years_since_start'] = int(selected_year) - 2006
+            if selected_crop == 'Maize':
+                if str(selected_market) not in Maize_data['market']:
+                    most_recent_year = int(selected_year) - 3
+                else:
+                    most_recent_year = int(selected_year) - 1
+                filtered_data = Maize_data[(Maize_data['market'] == market_mapping.get(str(selected_market))) &
+                                            (Maize_data['year'] == most_recent_year)]
+                
+                inputDict['yearly_average_price'] = filtered_data['yearly_average_price'].mode()
+
+                if int(selected_month) in filtered_data['month'].unique():
+                    inputDict['monthly_average_price'] = filtered_data.loc[filtered_data['month'] == int(selected_month)]['market_average_price'].reset_index(drop=True)
+                else:
+                    inputDict['monthly_average_price'] = filtered_data['monthly_average_price'].mean()
+                
+                inputDict['market_average_price'] = filtered_data['market_average_price'].mode()
+
+                inputDict['commodity_yearly_average_price'] = filtered_data['commodity_yearly_average_price'].mode()
+
+                if int(selected_month) in filtered_data['month'].unique():
+                    inputDict['commodity_monthly_average_price'] = filtered_data.loc[filtered_data['month'] == int(selected_month)]['commodity_monthly_average_price'].reset_index(drop=True)
+                else:
+                    inputDict['commodity_monthly_average_price'] = filtered_data['commodity_monthly_average_price'].mean()
+                
+                filtered_data = filtered_data.drop(['market', 'year', 'month', 'years_since_start', 'yearly_average_price', 'monthly_average_price', 'market_average_price', 'commodity_yearly_average_price', 'commodity_monthly_average_price'], axis=1)
+                
+                for col in filtered_data.columns:
+                    inputDict[col] = filtered_data[col].mean()
+
+            elif selected_crop == 'Beans':
+                if str(selected_market) not in Beans_data['market']:
+                    most_recent_year = int(selected_year) - 3
+                else:
+                    most_recent_year = int(selected_year) - 1
+                filtered_data = Beans_data[(Beans_data['market'] == market_mapping.get(str(selected_market))) &
+                                            (Beans_data['year'] == most_recent_year)]
+                
+                inputDict['yearly_average_price'] = filtered_data['yearly_average_price'].mode()
+
+                if int(selected_month) in filtered_data['month'].unique():
+                    inputDict['monthly_average_price'] = filtered_data.loc[filtered_data['month'] == int(selected_month)]['market_average_price'].reset_index(drop=True)
+                else:
+                    inputDict['monthly_average_price'] = filtered_data['monthly_average_price'].mean()
+                
+                inputDict['market_average_price'] = filtered_data['market_average_price'].mode()
+
+                inputDict['commodity_yearly_average_price'] = filtered_data['commodity_yearly_average_price'].mode()
+
+                if int(selected_month) in filtered_data['month'].unique():
+                    inputDict['commodity_monthly_average_price'] = filtered_data.loc[filtered_data['month'] == int(selected_month)]['commodity_monthly_average_price'].reset_index(drop=True)
+                else:
+                    inputDict['commodity_monthly_average_price'] = filtered_data['commodity_monthly_average_price'].mean()
+                
+                filtered_data = filtered_data.drop(['market', 'year', 'month', 'years_since_start', 'yearly_average_price', 'monthly_average_price', 'market_average_price', 'commodity_yearly_average_price', 'commodity_monthly_average_price'], axis=1)
+                
+                for col in filtered_data.columns:
+                    inputDict[col] = filtered_data[col].mean()
+
+            elif selected_crop == 'Rice':
+                if str(selected_market) not in Rice_data['market']:
+                    most_recent_year = int(selected_year) - 3
+                else:
+                    most_recent_year = int(selected_year) - 1
+                filtered_data = Rice_data[(Rice_data['market'] == market_mapping.get(str(selected_market))) &
+                                            (Rice_data['year'] == most_recent_year)]
+                
+                inputDict['yearly_average_price'] = filtered_data['yearly_average_price'].mode()
+
+                if int(selected_month) in filtered_data['month'].unique():
+                    inputDict['monthly_average_price'] = filtered_data.loc[filtered_data['month'] == int(selected_month)]['market_average_price'].reset_index(drop=True)
+                else:
+                    inputDict['monthly_average_price'] = filtered_data['monthly_average_price'].mean()
+                
+                inputDict['market_average_price'] = filtered_data['market_average_price'].mode()
+
+                inputDict['commodity_yearly_average_price'] = filtered_data['commodity_yearly_average_price'].mode()
+
+                if int(selected_month) in filtered_data['month'].unique():
+                    inputDict['commodity_monthly_average_price'] = filtered_data.loc[filtered_data['month'] == int(selected_month)]['commodity_monthly_average_price'].reset_index(drop=True)
+                else:
+                    inputDict['commodity_monthly_average_price'] = filtered_data['commodity_monthly_average_price'].mean()
+                
+                filtered_data = filtered_data.drop(['market', 'year', 'month', 'years_since_start', 'yearly_average_price', 'monthly_average_price', 'market_average_price', 'commodity_yearly_average_price', 'commodity_monthly_average_price'], axis=1)
+                
+                for col in filtered_data.columns:
+                    inputDict[col] = filtered_data[col].mean()
+
+            return pd.DataFrame(inputDict, columns=column_order)
+
+
+        predicted_price = None
+
+        inputs = {}
 
         if selected_crop == 'Maize':
-            if str(selected_market) not in Maize_data['market']:
-                most_recent_year = int(selected_year) - 3
-            else:
-                 most_recent_year = int(selected_year) - 1
-            filtered_data = Maize_data[(Maize_data['market'] == market_mapping.get(str(selected_market))) &
-                                        (Maize_data['year'] == most_recent_year)]
-            
-            inputDict['yearly_average_price'] = filtered_data['yearly_average_price'].mode()
-
-            if int(selected_month) in filtered_data['month'].unique():
-                inputDict['monthly_average_price'] = filtered_data.loc[filtered_data['month'] == int(selected_month)]['market_average_price'].reset_index(drop=True)
-            else:
-                inputDict['monthly_average_price'] = filtered_data['monthly_average_price'].mean()
-            
-            inputDict['market_average_price'] = filtered_data['market_average_price'].mode()
-
-            inputDict['commodity_yearly_average_price'] = filtered_data['commodity_yearly_average_price'].mode()
-
-            if int(selected_month) in filtered_data['month'].unique():
-                inputDict['commodity_monthly_average_price'] = filtered_data.loc[filtered_data['month'] == int(selected_month)]['commodity_monthly_average_price'].reset_index(drop=True)
-            else:
-                inputDict['commodity_monthly_average_price'] = filtered_data['commodity_monthly_average_price'].mean()
-            
-            filtered_data = filtered_data.drop(['market', 'year', 'month', 'years_since_start', 'yearly_average_price', 'monthly_average_price', 'market_average_price', 'commodity_yearly_average_price', 'commodity_monthly_average_price'], axis=1)
-            
-            for col in filtered_data.columns:
-                inputDict[col] = filtered_data[col].mean()
-
+            dataFrame = pipelineInput(inputDict=inputs)
+            json_data = dataFrame.to_json(orient='records')
+            res = requests.post('https://crops-api.site.atomatiki.tech/predict-maize', json=json.loads(json_data)[0], headers={'Content-Type': 'application/json', 'Content-Security-Policy':'upgrade-insecure-requests'})
+            predicted_price = res.json()
         elif selected_crop == 'Beans':
-            if str(selected_market) not in Beans_data['market']:
-                most_recent_year = int(selected_year) - 3
-            else:
-                 most_recent_year = int(selected_year) - 1
-            filtered_data = Beans_data[(Beans_data['market'] == market_mapping.get(str(selected_market))) &
-                                        (Beans_data['year'] == most_recent_year)]
-            
-            inputDict['yearly_average_price'] = filtered_data['yearly_average_price'].mode()
-
-            if int(selected_month) in filtered_data['month'].unique():
-                inputDict['monthly_average_price'] = filtered_data.loc[filtered_data['month'] == int(selected_month)]['market_average_price'].reset_index(drop=True)
-            else:
-                inputDict['monthly_average_price'] = filtered_data['monthly_average_price'].mean()
-            
-            inputDict['market_average_price'] = filtered_data['market_average_price'].mode()
-
-            inputDict['commodity_yearly_average_price'] = filtered_data['commodity_yearly_average_price'].mode()
-
-            if int(selected_month) in filtered_data['month'].unique():
-                inputDict['commodity_monthly_average_price'] = filtered_data.loc[filtered_data['month'] == int(selected_month)]['commodity_monthly_average_price'].reset_index(drop=True)
-            else:
-                inputDict['commodity_monthly_average_price'] = filtered_data['commodity_monthly_average_price'].mean()
-            
-            filtered_data = filtered_data.drop(['market', 'year', 'month', 'years_since_start', 'yearly_average_price', 'monthly_average_price', 'market_average_price', 'commodity_yearly_average_price', 'commodity_monthly_average_price'], axis=1)
-            
-            for col in filtered_data.columns:
-                inputDict[col] = filtered_data[col].mean()
-
+            dataFrame = pipelineInput(inputDict=inputs)
+            json_data = dataFrame.to_json(orient='records')
+            res = requests.post('https://crops-api.site.atomatiki.tech/predict-beans', json=json.loads(json_data)[0], headers={'Content-Type': 'application/json', 'Content-Security-Policy':'upgrade-insecure-requests'})
+            predicted_price = res.json()
         elif selected_crop == 'Rice':
-            if str(selected_market) not in Rice_data['market']:
-                most_recent_year = int(selected_year) - 3
-            else:
-                 most_recent_year = int(selected_year) - 1
-            filtered_data = Rice_data[(Rice_data['market'] == market_mapping.get(str(selected_market))) &
-                                        (Rice_data['year'] == most_recent_year)]
-            
-            inputDict['yearly_average_price'] = filtered_data['yearly_average_price'].mode()
-
-            if int(selected_month) in filtered_data['month'].unique():
-                inputDict['monthly_average_price'] = filtered_data.loc[filtered_data['month'] == int(selected_month)]['market_average_price'].reset_index(drop=True)
-            else:
-                inputDict['monthly_average_price'] = filtered_data['monthly_average_price'].mean()
-            
-            inputDict['market_average_price'] = filtered_data['market_average_price'].mode()
-
-            inputDict['commodity_yearly_average_price'] = filtered_data['commodity_yearly_average_price'].mode()
-
-            if int(selected_month) in filtered_data['month'].unique():
-                inputDict['commodity_monthly_average_price'] = filtered_data.loc[filtered_data['month'] == int(selected_month)]['commodity_monthly_average_price'].reset_index(drop=True)
-            else:
-                inputDict['commodity_monthly_average_price'] = filtered_data['commodity_monthly_average_price'].mean()
-            
-            filtered_data = filtered_data.drop(['market', 'year', 'month', 'years_since_start', 'yearly_average_price', 'monthly_average_price', 'market_average_price', 'commodity_yearly_average_price', 'commodity_monthly_average_price'], axis=1)
-            
-            for col in filtered_data.columns:
-                inputDict[col] = filtered_data[col].mean()
-
-        return pd.DataFrame(inputDict, columns=column_order)
-
-
-    predicted_price = None
-
-    inputs = {}
-
-    if selected_crop == 'Maize':
-        dataFrame = pipelineInput(inputDict=inputs)
-        json_data = dataFrame.to_json(orient='records')
-        res = requests.post('https://crops-api.site.atomatiki.tech/predict-maize', json=json.loads(json_data)[0], headers={'Content-Type': 'application/json', 'Content-Security-Policy':'upgrade-insecure-requests'})
-        predicted_price = res.json()
-    elif selected_crop == 'Beans':
-        dataFrame = pipelineInput(inputDict=inputs)
-        json_data = dataFrame.to_json(orient='records')
-        res = requests.post('https://crops-api.site.atomatiki.tech/predict-beans', json=json.loads(json_data)[0], headers={'Content-Type': 'application/json', 'Content-Security-Policy':'upgrade-insecure-requests'})
-        predicted_price = res.json()
-    elif selected_crop == 'Rice':
-        dataFrame = pipelineInput(inputDict=inputs)
-        json_data = dataFrame.to_json(orient='records')
-        res = requests.post('https://crops-api.site.atomatiki.tech/predict-rice', json=json.loads(json_data)[0], headers={'Content-Type': 'application/json', 'Content-Security-Policy':'upgrade-insecure-requests'})
-        predicted_price = res.json()
-    if predicted_price is not None:
-        return f'TZS {float(predicted_price):,.2f}'
-    return ''
+            dataFrame = pipelineInput(inputDict=inputs)
+            json_data = dataFrame.to_json(orient='records')
+            res = requests.post('https://crops-api.site.atomatiki.tech/predict-rice', json=json.loads(json_data)[0], headers={'Content-Type': 'application/json', 'Content-Security-Policy':'upgrade-insecure-requests'})
+            predicted_price = res.json()
+        if predicted_price is not None:
+            return f'TZS {float(predicted_price):,.2f}'
+        return ''
 
 
 @callback(

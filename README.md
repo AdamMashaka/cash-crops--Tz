@@ -2,7 +2,7 @@
 This project consists of a ML model that predicts the price trend of food crops in Tanzania especially Maize, Rice and Beans
 ## Project Description
 
-AidFlow is a decentralized humanitarian aid platform built on the Filecoin Virtual Machine (FVM) that revolutionizes the distribution of aid during emergencies and crises. It ensures transparency, efficiency, and accountability in aid delivery, making a positive impact on vulnerable communities.
+Cash crops predition is the web applicaton which hae Machine learning embebed system in order to predict the cash flow within our country
 
 **Who do this project:**
 - Adam .M. Katani (Github: @AdamMAshaka,
